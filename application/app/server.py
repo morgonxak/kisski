@@ -14,7 +14,7 @@ def pinger():
     while True:
         threads = []
         troops = []
-        for key, value in clientID:
+        for key, value in clientID.items():
             def ping():
                 (conn, lock) = value
                 with lock:
@@ -24,6 +24,7 @@ def pinger():
                     except socket.error:
                         troops.append(key)
             t = Thread(target=ping, daemon=True)
+            t.start()
             threads.append(t)
         for t in threads:
             t.join()
@@ -68,4 +69,12 @@ def init_server():
         sock.close()
         print('Interrupted')
 
-init_server()
+t = Thread(target=init_server(), daemon=True)
+t.start()
+# init_server()
+while len(clientID) < 1: time.sleep(0.1)
+pair = clientID.get(0)
+with pair[123]:
+    pair[0].send(1)
+    time.sleep(7)
+    pair[0].send(b'i')

